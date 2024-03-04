@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://drnbd0u62giuf"]
+[gd_scene load_steps=19 format=3 uid="uid://drnbd0u62giuf"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_voltm"]
 [ext_resource type="PackedScene" uid="uid://dq5dxtxsmvtp3" path="res://models/Pistol.blend" id="2_jgx87"]
@@ -190,47 +190,12 @@ tracks/1/keys = {
 "values": [Vector3(0.486888, -0.4, -0.7), Vector3(0.486888, -0.437428, -0.7)]
 }
 
-[sub_resource type="Animation" id="Animation_7dfud"]
-resource_name = "rifle_shoot"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera3D/rifle:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(-2, -2),
-"update": 0,
-"values": [Vector3(0.486888, -0.4, -0.6), Vector3(0.486888, -0.4, -0.7)]
-}
-
-[sub_resource type="Animation" id="Animation_u47o1"]
-resource_name = "rifle_move"
-loop_mode = 1
-step = 0.25
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera3D/rifle:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5, 0.75),
-"transitions": PackedFloat32Array(0.5, 0.5, 0.5, 0.5),
-"update": 0,
-"values": [Vector3(0.486888, -0.4, -0.7), Vector3(0.430449, -0.352051, -0.7), Vector3(0.580326, -0.352051, -0.7), Vector3(0.599416, -0.285642, -0.7)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_0sj1b"]
 _data = {
 "RESET": SubResource("Animation_7twge"),
 "idle": SubResource("Animation_bniva"),
 "move": SubResource("Animation_cpem3"),
 "rifle_idle": SubResource("Animation_akjq5"),
-"rifle_move": SubResource("Animation_u47o1"),
-"rifle_shoot": SubResource("Animation_7dfud"),
 "shoot": SubResource("Animation_fahly")
 }
 
@@ -262,7 +227,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Pistol" parent="Camera3D" instance=ExtResource("2_jgx87")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.25, -0.5)
-visible = false
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/Pistol"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0606869, -0.296212)
@@ -282,10 +246,10 @@ collision_mask = 2
 transform = Transform3D(-4.37114e-08, 1, -4.37114e-08, 0, -4.37114e-08, -1, -1, -4.37114e-08, 1.91069e-15, 0.486888, -0.4, -0.7)
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/rifle"]
-transform = Transform3D(0.999688, 0.000453844, -0.0249129, -0.000313434, 0.999984, 0.00563877, 0.024915, -0.0056292, 0.999672, 0.907565, -0.0114227, -0.224601)
+transform = Transform3D(0.999689, 0.000453844, -0.0249129, -0.000313434, 0.999984, 0.00563877, 0.0249151, -0.00562921, 0.999673, 0.907565, 0.0587742, -0.189781)
 emitting = false
 amount = 1
-lifetime = 0.01
+lifetime = 0.25
 one_shot = true
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_b8vx6")
