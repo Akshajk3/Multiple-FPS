@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://drnbd0u62giuf"]
+[gd_scene load_steps=23 format=3 uid="uid://drnbd0u62giuf"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_voltm"]
 [ext_resource type="PackedScene" uid="uid://dq5dxtxsmvtp3" path="res://models/Pistol.blend" id="2_jgx87"]
@@ -6,7 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://cjg2lmblkdeyl" path="res://addons/kenney_particle_pack/star_06.png" id="3_44ttr"]
 [ext_resource type="PackedScene" uid="uid://cldodl2w16hbq" path="res://models/rifle.blend" id="4_oce0w"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gent8"]
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1vp3u"]
+material = SubResource("StandardMaterial3D_gent8")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_opqd4"]
 

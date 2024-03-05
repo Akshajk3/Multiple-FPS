@@ -12,7 +12,9 @@ signal pause(pause_value)
 @onready var rifle = $Camera3D/rifle
 @onready var pistol = $Camera3D/Pistol
 
-@export var health = 3
+@export var health = 100
+
+@onready var muzzel_flash = pistol_flash
 
 const SPEED = 10.0
 const JUMP_VELOCITY = 9
@@ -41,7 +43,7 @@ func _ready():
 	var random_blue = randi_range(0, 255)
 	
 	var random_color = Color(random_red, random_green, random_blue)
-	#mesh.material_override.albedo_color = random_color
+	#mesh.get_surface_override_material(0).albedo_color = random_color
 	
 	get_parent().sens_changed.connect(update_sens)
 
@@ -57,7 +59,6 @@ func _unhandled_input(event):
 		
 	if Input.is_action_pressed("shoot") and anim_player.current_animation != current_weapon + "_shoot":
 		play_shoot_effects.rpc()
-		print("SHoowr")
 		if raycast.is_colliding():
 			var hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
@@ -66,10 +67,12 @@ func _unhandled_input(event):
 		current_weapon = "pistol"
 		rifle.hide()
 		pistol.show()
+		muzzel_flash = pistol_flash
 	if Input.is_action_just_pressed("2"):
 		current_weapon = "rifle"
 		pistol.hide()
 		rifle.show()
+		muzzel_flash = rifle_flash
 
 func _physics_process(delta):
 	
@@ -112,9 +115,9 @@ func play_shoot_effects():
 
 @rpc("any_peer")
 func receive_damage():
-	health -= 1
+	health -= 10
 	if health <= 0:
-		health = 3
+		health = 100
 		position = Vector3.ZERO
 	health_changed.emit(health)
 

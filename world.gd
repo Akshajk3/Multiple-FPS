@@ -37,7 +37,8 @@ func _on_host_button_pressed():
 	
 	add_player(multiplayer.get_unique_id())
 	
-	#upnp_setup()
+	upnp_setup()
+	in_game = true
 
 func _on_join_button_pressed():
 	main_menu.hide()
@@ -45,6 +46,7 @@ func _on_join_button_pressed():
 	
 	enet_peer.create_client(address_entry.text, PORT)
 	multiplayer.multiplayer_peer = enet_peer
+	in_game = true
 
 func add_player(peer_id):
 	var player = Player.instantiate()
@@ -54,7 +56,7 @@ func add_player(peer_id):
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
 		player.pause.connect(pause_game)
-	in_game = true
+
 
 func remove_player(peer_id):
 	var player = get_node_or_null(str(peer_id))
