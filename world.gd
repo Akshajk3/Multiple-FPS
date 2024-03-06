@@ -8,6 +8,7 @@ signal sens_changed(sens_value)
 @onready var health_bar = $"CanvasLayer/HUD/Health Bar"
 @onready var pause_menu = $"CanvasLayer/Pause Menu"
 @onready var settings_menu = $"CanvasLayer/Settings Menu"
+@onready var address_label = $"CanvasLayer/HUD/Address Label"
 
 
 const Player = preload("res://player.tscn")
@@ -37,7 +38,7 @@ func _on_host_button_pressed():
 	
 	add_player(multiplayer.get_unique_id())
 	
-	upnp_setup()
+	#upnp_setup()
 	in_game = true
 
 func _on_join_button_pressed():
@@ -84,6 +85,7 @@ func upnp_setup():
 	assert(map_result == UPNP.UPNP_RESULT_SUCCESS, "UPNP PORT MAPPING FAILED! ERROR %s" % map_result)
 	
 	print("SUCCESS! JOIN ADDRESS: %s" % upnp.query_external_address())
+	address_label.text = upnp.query_external_address()
 
 func _on_check_box_toggled(toggled_on):
 	if toggled_on:
