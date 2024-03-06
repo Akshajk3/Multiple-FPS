@@ -36,15 +36,6 @@ func _ready():
 		return
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	camera.current = true
-	
-	# Generate random color values for red, green, and blue components
-	var random_red = randi_range(0, 255)
-	var random_green = randi_range(0, 255)
-	var random_blue = randi_range(0, 255)
-	
-	var random_color = Color(random_red, random_green, random_blue)
-	#mesh.get_surface_override_material(0).albedo_color = random_color
-	
 	get_parent().sens_changed.connect(update_sens)
 
 func _unhandled_input(event):
@@ -57,11 +48,18 @@ func _unhandled_input(event):
 		camera.rotate_x(-event.relative.y * MOUSE_SENS)
 		camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		
+
+func _process(delta):
+	if not is_multiplayer_authority():
+		return
+	if paused:
+		return
 	if Input.is_action_pressed("shoot") and anim_player.current_animation != current_weapon + "_shoot":
 		play_shoot_effects.rpc()
 		if raycast.is_colliding():
 			var hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
+
 	
 	if Input.is_action_just_pressed("1"):
 		current_weapon = "pistol"
@@ -75,7 +73,6 @@ func _unhandled_input(event):
 		muzzel_flash = rifle_flash
 
 func _physics_process(delta):
-	
 	if not is_multiplayer_authority():
 		return
 	# Add the gravity.

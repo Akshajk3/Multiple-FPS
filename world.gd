@@ -38,7 +38,7 @@ func _on_host_button_pressed():
 	
 	add_player(multiplayer.get_unique_id())
 	
-	#upnp_setup()
+	upnp_setup()
 	in_game = true
 
 func _on_join_button_pressed():
@@ -47,6 +47,7 @@ func _on_join_button_pressed():
 	
 	enet_peer.create_client(address_entry.text, PORT)
 	multiplayer.multiplayer_peer = enet_peer
+	address_label.text = ""
 	in_game = true
 
 func add_player(peer_id):
