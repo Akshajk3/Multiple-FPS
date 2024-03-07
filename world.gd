@@ -9,6 +9,7 @@ signal sens_changed(sens_value)
 @onready var pause_menu = $"CanvasLayer/Pause Menu"
 @onready var settings_menu = $"CanvasLayer/Settings Menu"
 @onready var address_label = $"CanvasLayer/HUD/Address Label"
+@onready var color_menu = $"CanvasLayer/Color Menu"
 
 
 const Player = preload("res://player.tscn")
@@ -73,7 +74,6 @@ func _on_multiplayer_spawner_spawned(node):
 		node.health_changed.connect(update_health_bar)
 	
 
-
 func upnp_setup():
 	var upnp = UPNP.new()
 	
@@ -124,3 +124,7 @@ func _on_h_slider_value_changed(value):
 func _on_resume_button_pressed():
 	paused = !paused
 	pause_game()
+
+
+func _on_back_button_pressed():
+	pass # Replace with function body.

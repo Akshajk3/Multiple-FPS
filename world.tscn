@@ -38,6 +38,7 @@ environment = SubResource("Environment_44jh0")
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Main Menu" type="PanelContainer" parent="CanvasLayer"]
+visible = false
 anchors_preset = -1
 anchor_left = 0.424479
 anchor_top = 0.412037
@@ -232,9 +233,44 @@ value = 30.0
 layout_mode = 2
 text = "Fullscreen"
 
+[node name="Change Color" type="Button" parent="CanvasLayer/Settings Menu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Change Color"
+
 [node name="Close Button" type="Button" parent="CanvasLayer/Settings Menu/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Close Settings"
+
+[node name="Color Menu" type="PanelContainer" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_left = 0.424479
+anchor_top = 0.401389
+anchor_right = 0.575521
+anchor_bottom = 0.599537
+offset_top = 11.5
+offset_bottom = -11.5
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Color Menu"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Color Menu/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="ColorPicker" type="ColorPicker" parent="CanvasLayer/Color Menu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+picker_shape = 2
+
+[node name="Back Button" type="Button" parent="CanvasLayer/Color Menu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Back Button"
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://player.tscn")
@@ -248,4 +284,5 @@ spawn_path = NodePath("..")
 [connection signal="value_changed" from="CanvasLayer/Settings Menu/MarginContainer/VBoxContainer/HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="toggled" from="CanvasLayer/Settings Menu/MarginContainer/VBoxContainer/CheckBox" to="." method="_on_check_box_toggled"]
 [connection signal="pressed" from="CanvasLayer/Settings Menu/MarginContainer/VBoxContainer/Close Button" to="." method="_on_close_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Color Menu/MarginContainer/VBoxContainer/Back Button" to="." method="_on_back_button_pressed"]
 [connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]
