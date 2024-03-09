@@ -1,7 +1,6 @@
 extends CharacterBody3D
 
 signal health_changed(health_value)
-signal pause(pause_value)
 
 @onready var camera = $Camera3D
 @onready var anim_player = $AnimationPlayer
@@ -37,6 +36,8 @@ func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	camera.current = true
 	get_parent().sens_changed.connect(update_sens)
+	get_parent().color_changed.connect(update_color)
+	get_parent().game_paused.connect(pause)
 
 func _unhandled_input(event):
 	if not is_multiplayer_authority():
@@ -78,11 +79,11 @@ func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-
+	
 	# Handle jump.
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-
+		
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
@@ -128,3 +129,15 @@ func _on_animation_player_animation_finished(anim_name):
 		
 func update_sens(sens):
 	MOUSE_SENS = sens / 10000
+
+func change_color(color):
+	update_color(color).rpc()
+
+@rpc("call_local")
+func update_color(color):
+	var new_material = StandardMaterial3D.new()
+	new_material.albedo_color = color
+	mesh.material_override = new_material
+
+func pause(state):
+	paused = state

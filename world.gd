@@ -1,6 +1,8 @@
 extends Node
 
 signal sens_changed(sens_value)
+signal color_changed(color)
+signal game_paused(paused)
 
 @onready var main_menu = $"CanvasLayer/Main Menu"
 @onready var address_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/AddressEntry"
@@ -58,7 +60,6 @@ func add_player(peer_id):
 	add_child(player)
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
-		player.pause.connect(pause_game)
 
 
 func remove_player(peer_id):
@@ -99,10 +100,12 @@ func pause_game():
 		HUD.hide()
 		pause_menu.show()
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		game_paused.emit(true)
 	else:
 		pause_menu.hide()
 		HUD.show()
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		game_paused.emit(false)
 
 func _on_quit_button_pressed():
 	get_tree().quit()
@@ -127,4 +130,14 @@ func _on_resume_button_pressed():
 
 
 func _on_back_button_pressed():
-	pass # Replace with function body.
+	color_menu.hide()
+	settings_menu.show()
+
+
+func _on_color_picker_color_changed(color):
+	color_changed.emit(color)
+
+
+func _on_change_color_pressed():
+	settings_menu.hide()
+	color_menu.show()
