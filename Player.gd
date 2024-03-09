@@ -131,9 +131,9 @@ func update_sens(sens):
 	MOUSE_SENS = sens / 10000
 
 func change_color(color):
-	update_color(color).rpc()
+	update_color(color)
 
-@rpc("call_local")
+@rpc("call_remote")
 func update_color(color):
 	var new_material = StandardMaterial3D.new()
 	new_material.albedo_color = color

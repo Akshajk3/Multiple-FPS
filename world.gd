@@ -15,12 +15,15 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-const PORT = 9999
+var PORT = 6001
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
 var in_game = false
 
+func _ready():
+	pass
+	
 func _unhandled_input(event):
 	if in_game:
 		if Input.is_action_pressed("quit"):
