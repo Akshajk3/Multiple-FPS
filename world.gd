@@ -16,13 +16,15 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 6001
+var PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
 var in_game = false
 
 func _ready():
+	#find_available_port()
+	
 	main_menu.show()
 	HUD.hide()
 	pause_menu.hide()
@@ -42,8 +44,6 @@ func _on_host_button_pressed():
 	main_menu.hide()
 	HUD.show()
 	
-	#find_available_port()
-	
 	enet_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = enet_peer
 	multiplayer.peer_connected.connect(add_player)
@@ -58,8 +58,10 @@ func _on_join_button_pressed():
 	main_menu.hide()
 	HUD.show()
 	var address = ""
-	if address_label.text == "1234":
+	if address_entry.text == "1234":
 		address = "104.33.64.173"
+	else:
+		address = address_entry.text
 	enet_peer.create_client(address, PORT)
 	multiplayer.multiplayer_peer = enet_peer
 	address_label.text = ""

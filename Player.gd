@@ -47,6 +47,10 @@ var gravity = 20.0
 var paused = false
 var sprinting = false
 var reloading = false
+var wall_running = false
+
+var wall_normal = Vector3() 
+var direction = Vector3(0, 0, 0)
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -75,7 +79,10 @@ func wall_run():
 	if Input.is_action_pressed("ui_accept"):
 		if Input.is_action_pressed("up"):
 			if is_on_wall():
-				pass
+				wall_normal = get_slide_collision(0)
+				await get_tree().create_timer(0.2).timeout
+				velocity.y = 0
+				#direction = -wall_normal * SPEED
 
 func _process(delta):
 	if not is_multiplayer_authority():
@@ -132,10 +139,12 @@ func _physics_process(delta):
 	if Input.is_action_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 		
+	#wall_run()
+		
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if is_on_floor():
 		if direction:
 			velocity.x = direction.x * SPEED
