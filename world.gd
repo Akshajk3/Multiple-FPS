@@ -13,6 +13,8 @@ signal game_paused(paused)
 @onready var settings_menu = $"CanvasLayer/Settings Menu"
 @onready var address_label = $"CanvasLayer/HUD/Address Label"
 @onready var color_menu = $"CanvasLayer/Color Menu"
+@onready var scoreboard = $CanvasLayer/HUD/Scoreboard
+@onready var username_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/UsernameEntry"
 
 
 const Player = preload("res://player.tscn")
@@ -49,7 +51,10 @@ func _on_host_button_pressed():
 	multiplayer.peer_connected.connect(add_player)
 	multiplayer.peer_disconnected.connect(remove_player)
 	
-	add_player(multiplayer.get_unique_id())
+	if username_entry.text == "":
+		add_player(multiplayer.get_unique_id())
+	else:
+		add_player(username_entry.text)
 	
 	upnp_setup()
 	in_game = true
@@ -70,7 +75,11 @@ func _on_join_button_pressed():
 func add_player(peer_id):
 	var player = Player.instantiate()
 	player.name = str(peer_id)
-	
+	var playerLabel = Label.new()
+	playerLabel.name = str(peer_id)
+	playerLabel.text = str(peer_id) + ":"
+	playerLabel.add_theme_font_size_override(str(peer_id), 200)
+	scoreboard.add_child(playerLabel)
 	add_child(player)
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
@@ -92,7 +101,6 @@ func _on_multiplayer_spawner_spawned(node):
 	if node.is_multiplayer_authority():
 		node.health_changed.connect(update_health_bar)
 		node.ammo_changed.connect(update_ammo_label)
-	
 
 func upnp_setup():
 	var upnp = UPNP.new()

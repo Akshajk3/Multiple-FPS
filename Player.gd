@@ -11,6 +11,7 @@ signal ammo_changed(ammo_value)
 @onready var mesh = $MeshInstance3D
 @onready var rifle = $Camera3D/rifle
 @onready var pistol = $Camera3D/Pistol
+@onready var username_label = $Username
 
 @export var health = 100
 @onready var player_color = mesh.material_override.albedo_color
@@ -50,7 +51,7 @@ var reloading = false
 var wall_running = false
 
 var wall_normal = Vector3() 
-var direction = Vector3(0, 0, 0)
+var direction = Vector3()
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -63,6 +64,7 @@ func _ready():
 	get_parent().sens_changed.connect(update_sens)
 	get_parent().color_changed.connect(update_color)
 	get_parent().game_paused.connect(pause)
+	update_username.rpc()
 
 func _unhandled_input(event):
 	if not is_multiplayer_authority():
@@ -186,7 +188,6 @@ func play_shoot_effects():
 	ammo -= 1
 	ammo = max(ammo, 0)
 	ammo_changed.emit(ammo)
-	print(current_damage)
 
 @rpc("call_local")
 func play_reload_effects():
@@ -201,12 +202,23 @@ func play_reload_effects():
 		ammo = pistol_ammo
 	ammo_changed.emit(ammo)
 
+@rpc("call_local")
+func update_username():
+	username_label.text = get_name()
+
 @rpc("any_peer")
 func receive_damage():
-	health -= current_damage
+	health -= 10
 	if health <= 0:
 		health = 100
 		position = Vector3.ZERO
+		if current_weapon == "rifle":
+			rifle_ammo = 30
+			ammo = rifle_ammo
+		else:
+			pistol_ammo = 8
+			ammo = pistol_ammo
+	ammo_changed.emit(ammo)
 	health_changed.emit(health)
 
 func _on_animation_player_animation_finished(anim_name):
