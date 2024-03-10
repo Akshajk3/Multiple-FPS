@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal health_changed(health_value)
+signal ammo_changed(ammo_value)
 
 @onready var camera = $Camera3D
 @onready var anim_player = $AnimationPlayer
@@ -21,10 +22,20 @@ const JUMP_VELOCITY = 9
 @export var walk_speed = 10.0
 @export var sprint_speed = 15.0
 
+var SPEED = walk_speed
+
 @export var base_fov = 75.0
 @export var fov_change = 1.5
 
-var SPEED = walk_speed
+var rifle_ammo = 30
+var pistol_ammo = 8
+
+var ammo = rifle_ammo
+
+var rifle_damage = 10
+var pistol_damage = 25
+
+var current_damage = rifle_damage
 
 var current_weapon = "rifle"
 
@@ -35,6 +46,7 @@ var gravity = 20.0
 
 var paused = false
 var sprinting = false
+var reloading = false
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -59,28 +71,49 @@ func _unhandled_input(event):
 		camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		
 
+func wall_run():
+	if Input.is_action_pressed("ui_accept"):
+		if Input.is_action_pressed("up"):
+			if is_on_wall():
+				pass
+
 func _process(delta):
 	if not is_multiplayer_authority():
 		return
 	if paused:
 		return
-	if Input.is_action_pressed("shoot") and anim_player.current_animation != current_weapon + "_shoot":
+	if Input.is_action_pressed("shoot") and anim_player.current_animation != current_weapon + "_shoot" and anim_player.current_animation != current_weapon + "_reload" and ammo > 0:
 		play_shoot_effects.rpc()
 		if raycast.is_colliding():
 			var hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
 	
-	if Input.is_action_just_pressed("2"):
+	if Input.is_action_just_pressed("reload") and anim_player.current_animation != current_weapon + "_reload":
+		if current_weapon == "rifle" and ammo >= 30:
+			pass
+		elif current_weapon == "pistol" and ammo >= 8:
+			pass
+		else:
+			play_reload_effects.rpc()
+	
+	if Input.is_action_just_pressed("2") and anim_player.current_animation != current_weapon + "_reload" and current_weapon != "pistol":
 		current_weapon = "pistol"
 		rifle.hide()
 		pistol.show()
 		muzzel_flash = pistol_flash
-	if Input.is_action_just_pressed("1"):
+		rifle_ammo = ammo
+		ammo = pistol_ammo
+		ammo_changed.emit(ammo)
+		current_damage = pistol_damage
+	if Input.is_action_just_pressed("1") and anim_player.current_animation != current_weapon + "_reload" and current_weapon != "rifle":
 		current_weapon = "rifle"
 		pistol.hide()
 		rifle.show()
 		muzzel_flash = rifle_flash
-	
+		pistol_ammo = ammo
+		ammo = rifle_ammo
+		ammo_changed.emit(ammo)
+		current_damage = rifle_damage
 	if Input.is_action_pressed("sprint"):
 		SPEED = sprint_speed
 		sprinting = true
@@ -114,7 +147,9 @@ func _physics_process(delta):
 		velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 7.0)
 		velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 7.0)
 		
-	if anim_player.current_animation == current_weapon + "_shoot":
+	if anim_player.current_animation == current_weapon + "_reload":
+		pass
+	elif anim_player.current_animation == current_weapon + "_shoot":
 		pass
 	elif input_dir != Vector2.ZERO and is_on_floor():
 		anim_player.play(current_weapon + "_move")
@@ -139,10 +174,27 @@ func play_shoot_effects():
 	anim_player.play(current_weapon + "_shoot")
 	muzzel_flash.restart()
 	muzzel_flash.emitting = true
+	ammo -= 1
+	ammo = max(ammo, 0)
+	ammo_changed.emit(ammo)
+	print(current_damage)
+
+@rpc("call_local")
+func play_reload_effects():
+	muzzel_flash.emitting = false
+	anim_player.stop()
+	anim_player.play(current_weapon + "_reload")
+	if current_weapon == "rifle":
+		rifle_ammo = 30
+		ammo = rifle_ammo
+	else:
+		pistol_ammo = 8
+		ammo = pistol_ammo
+	ammo_changed.emit(ammo)
 
 @rpc("any_peer")
 func receive_damage():
-	health -= 10
+	health -= current_damage
 	if health <= 0:
 		health = 100
 		position = Vector3.ZERO
@@ -158,7 +210,7 @@ func update_sens(sens):
 func change_color(color):
 	update_color.rpc(color)
 
-@rpc("call_remote")
+@rpc("call_local")
 func update_color(color):
 	var new_material = StandardMaterial3D.new()
 	new_material.albedo_color = Color(1.0, 1.0, 1.0)

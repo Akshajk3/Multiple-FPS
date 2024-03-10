@@ -8,6 +8,7 @@ signal game_paused(paused)
 @onready var address_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/AddressEntry"
 @onready var HUD = $CanvasLayer/HUD
 @onready var health_bar = $"CanvasLayer/HUD/Health Bar"
+@onready var ammo_label = $"CanvasLayer/HUD/Ammo Label"
 @onready var pause_menu = $"CanvasLayer/Pause Menu"
 @onready var settings_menu = $"CanvasLayer/Settings Menu"
 @onready var address_label = $"CanvasLayer/HUD/Address Label"
@@ -76,6 +77,7 @@ func add_player(peer_id):
 	add_child(player)
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
+		player.ammo_changed.connect(update_ammo_label)
 
 
 func remove_player(peer_id):
@@ -86,9 +88,13 @@ func remove_player(peer_id):
 func update_health_bar(health_value):
 	health_bar.value = health_value
 
+func update_ammo_label(ammo_value):
+	ammo_label.text = "Ammo: " + str(ammo_value)
+
 func _on_multiplayer_spawner_spawned(node):
 	if node.is_multiplayer_authority():
 		node.health_changed.connect(update_health_bar)
+		node.ammo_changed.connect(update_ammo_label)
 	
 
 func upnp_setup():
