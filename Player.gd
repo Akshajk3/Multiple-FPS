@@ -12,13 +12,21 @@ signal health_changed(health_value)
 @onready var pistol = $Camera3D/Pistol
 
 @export var health = 100
+@onready var player_color = mesh.material_override.albedo_color
 
 @onready var muzzel_flash = pistol_flash
 
-const SPEED = 10.0
 const JUMP_VELOCITY = 9
 
-var current_weapon = "pistol"
+@export var walk_speed = 10.0
+@export var sprint_speed = 15.0
+
+@export var base_fov = 75.0
+@export var fov_change = 1.5
+
+var SPEED = walk_speed
+
+var current_weapon = "rifle"
 
 @export var MOUSE_SENS = 0.003
 
@@ -26,6 +34,7 @@ var current_weapon = "pistol"
 var gravity = 20.0
 
 var paused = false
+var sprinting = false
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -60,18 +69,24 @@ func _process(delta):
 		if raycast.is_colliding():
 			var hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
-
 	
-	if Input.is_action_just_pressed("1"):
+	if Input.is_action_just_pressed("2"):
 		current_weapon = "pistol"
 		rifle.hide()
 		pistol.show()
 		muzzel_flash = pistol_flash
-	if Input.is_action_just_pressed("2"):
+	if Input.is_action_just_pressed("1"):
 		current_weapon = "rifle"
 		pistol.hide()
 		rifle.show()
 		muzzel_flash = rifle_flash
+	
+	if Input.is_action_pressed("sprint"):
+		SPEED = sprint_speed
+		sprinting = true
+	else:
+		SPEED = 10.0
+		sprinting = false
 
 func _physics_process(delta):
 	if not is_multiplayer_authority():
@@ -81,19 +96,23 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 	
 	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 		
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+	if is_on_floor():
+		if direction:
+			velocity.x = direction.x * SPEED
+			velocity.z = direction.z * SPEED
+		else:
+			velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 10.0)
+			velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 10.0)
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 7.0)
+		velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 7.0)
 		
 	if anim_player.current_animation == current_weapon + "_shoot":
 		pass
@@ -101,8 +120,18 @@ func _physics_process(delta):
 		anim_player.play(current_weapon + "_move")
 	else:
 		anim_player.play(current_weapon + "_idle")
+	
+	if sprinting:
+		var velocity_clamped = clamp(velocity.length(), 0.5, sprint_speed * 2)
+		var target_fov = base_fov + fov_change * velocity_clamped
+		camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
+	else:
+		camera.fov = lerp(camera.fov, 75.0, delta * 8.0)
 
 	move_and_slide()
+
+func slide():
+	pass
 
 @rpc("call_local")
 func play_shoot_effects():
@@ -119,10 +148,6 @@ func receive_damage():
 		position = Vector3.ZERO
 	health_changed.emit(health)
 
-@rpc("call_local")
-func set_player_remote_color(color):
-	mesh.material_override.albedo_color = color
-
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == current_weapon + "_shoot":
 		anim_player.play(current_weapon + "_idle")
@@ -131,12 +156,12 @@ func update_sens(sens):
 	MOUSE_SENS = sens / 10000
 
 func change_color(color):
-	update_color(color)
+	update_color.rpc(color)
 
 @rpc("call_remote")
 func update_color(color):
 	var new_material = StandardMaterial3D.new()
-	new_material.albedo_color = color
+	new_material.albedo_color = Color(1.0, 1.0, 1.0)
 	mesh.material_override = new_material
 
 func pause(state):

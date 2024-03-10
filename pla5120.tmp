@@ -255,7 +255,10 @@ properties/4/replication_mode = 1
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 2
 script = ExtResource("1_voltm")
+health = null
+walk_speed = null
 sprint_speed = 13.0
+MOUSE_SENS = null
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

@@ -88,6 +88,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/HUD"]
+texture_filter = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.485
