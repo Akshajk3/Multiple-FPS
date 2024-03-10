@@ -255,7 +255,6 @@ properties/4/replication_mode = 1
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 2
 script = ExtResource("1_voltm")
-sprint_speed = 13.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -271,7 +270,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Pistol" parent="Camera3D" instance=ExtResource("2_jgx87")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.25, -0.5)
-visible = false
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/Pistol"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0606869, -0.296212)
@@ -285,6 +283,7 @@ draw_pass_1 = SubResource("PlaneMesh_xin5r")
 
 [node name="rifle" parent="Camera3D" instance=ExtResource("4_oce0w")]
 transform = Transform3D(-3.61999e-06, 1, -3.61999e-06, 0, -3.61999e-06, -1, -1, -3.61999e-06, 1.31043e-11, 0.486888, -0.4, -0.7)
+visible = false
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/rifle"]
 transform = Transform3D(0.999688, 0.000453844, -0.0249129, -0.000313434, 0.999984, 0.00563877, 0.024915, -0.0056292, 0.999672, 0.907565, -0.0114227, -0.224601)
