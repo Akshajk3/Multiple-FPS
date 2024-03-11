@@ -19,7 +19,7 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 9999
+var PORT = 6001
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
@@ -81,14 +81,15 @@ func _on_join_button_pressed():
 func add_player(peer_id):
 	var player = Player.instantiate()
 	player.name = str(peer_id)
-	if is_host == true:
-		update_scoreboard(peer_id)
 	add_child(player)
 	peer_ids.append(peer_id)
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
 		player.ammo_changed.connect(update_ammo_label)
 		player.hitmarker.connect(show_hitmarker)
+	if is_host:
+		print("Hello")
+		update_scoreboard(peer_id)
 	print(peer_ids)
 
 @rpc("call_local")
@@ -101,12 +102,19 @@ func update_scoreboard(peer_id):
 
 @rpc("call_local")
 func remove_scoreboard(peer_id):
-	var node_index = 0
-	for i in range(peer_ids.size()):
+	var node_index = -1
+	print("Size: ", peer_ids.size())
+	for i in range(1):
+		print("Index: ", i)
 		if peer_ids[i] == peer_id:
 			node_index = i
-	var playerLabel = scoreboard.get_child(node_index)
-	scoreboard.remove_child(playerLabel)
+			break
+	if node_index != -1:
+		var playerLabel = scoreboard.get_child(node_index)
+		print("Removing Player: ", playerLabel.name)
+		scoreboard.remove_child(playerLabel)
+	else:
+		print("Peer ID ", peer_id, " not found in scoreboard.")
 
 func remove_player(peer_id):
 	var player = get_node_or_null(str(peer_id))
@@ -114,8 +122,8 @@ func remove_player(peer_id):
 		if peer_ids[i] == peer_id:
 			peer_ids.pop_at(i)
 	if player:
-		player.queue_free()
 		remove_scoreboard.rpc(peer_id)
+		player.queue_free()
 
 func update_health_bar(health_value):
 	health_bar.value = health_value
