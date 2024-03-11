@@ -287,7 +287,13 @@ properties/4/replication_mode = 1
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 2
 script = ExtResource("1_voltm")
+health = null
+walk_speed = null
 sprint_speed = 13.0
+base_fov = null
+fov_change = null
+MOUSE_SENS = null
+grapple_speed = null
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -332,6 +338,9 @@ draw_pass_1 = SubResource("PlaneMesh_xin5r")
 target_position = Vector3(0, 0, -50)
 collision_mask = 2
 
+[node name="GrappleCast" type="RayCast3D" parent="Camera3D"]
+target_position = Vector3(0, 0, -60)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 "": SubResource("AnimationLibrary_0sj1b")
@@ -346,7 +355,10 @@ replication_config = SubResource("SceneReplicationConfig_7pnrm")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 text = "Host"
 
+[node name="GrappleTimer" type="Timer" parent="."]
+wait_time = 0.1
+
 [node name="DashCooldown" type="Timer" parent="."]
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
-[connection signal="timeout" from="DashCooldown" to="." method="_on_dash_cooldown_timeout"]
+[connection signal="timeout" from="GrappleTimer" to="." method="_on_grapple_timer_timeout"]

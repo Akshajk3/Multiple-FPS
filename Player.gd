@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 signal health_changed(health_value)
 signal ammo_changed(ammo_value)
+signal hitmarker()
 
 @onready var camera = $Camera3D
 @onready var anim_player = $AnimationPlayer
@@ -12,6 +13,8 @@ signal ammo_changed(ammo_value)
 @onready var rifle = $Camera3D/rifle
 @onready var pistol = $Camera3D/Pistol
 @onready var username_label = $Username
+@onready var dash_cooldown = $DashCooldown
+@onready var dash_timer = $DashTimer
 
 @export var health = 100
 @onready var player_color = mesh.material_override.albedo_color
@@ -48,10 +51,10 @@ var gravity = 20.0
 var paused = false
 var sprinting = false
 var reloading = false
-var wall_running = false
-
-var wall_normal = Vector3() 
 var direction = Vector3()
+
+@export var dash_speed = 50
+var can_dash = true
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -77,14 +80,12 @@ func _unhandled_input(event):
 		camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 		
 
-func wall_run():
-	if Input.is_action_pressed("ui_accept"):
-		if Input.is_action_pressed("up"):
-			if is_on_wall():
-				wall_normal = get_slide_collision(0)
-				await get_tree().create_timer(0.2).timeout
-				velocity.y = 0
-				#direction = -wall_normal * SPEED
+func dash():
+	if Input.is_action_pressed("grapple") and can_dash:
+		SPEED = dash_speed
+		await get_tree().create_timer(0.1).timeout
+		can_dash = false
+		dash_cooldown.start()
 
 func _process(delta):
 	if not is_multiplayer_authority():
@@ -96,6 +97,7 @@ func _process(delta):
 		if raycast.is_colliding():
 			var hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
+			hitmarker.emit()
 	
 	if Input.is_action_just_pressed("reload") and anim_player.current_animation != current_weapon + "_reload":
 		if current_weapon == "rifle" and ammo >= 30:
@@ -129,6 +131,8 @@ func _process(delta):
 	else:
 		SPEED = 10.0
 		sprinting = false
+	
+	dash()
 
 func _physics_process(delta):
 	if not is_multiplayer_authority():
@@ -137,11 +141,10 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	
+	
 	# Handle jump.
 	if Input.is_action_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-		
-	#wall_run()
 		
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -157,7 +160,7 @@ func _physics_process(delta):
 	else:
 		velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 7.0)
 		velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 7.0)
-		
+	
 	if anim_player.current_animation == current_weapon + "_reload":
 		pass
 	elif anim_player.current_animation == current_weapon + "_shoot":
@@ -175,9 +178,6 @@ func _physics_process(delta):
 		camera.fov = lerp(camera.fov, 75.0, delta * 8.0)
 
 	move_and_slide()
-
-func slide():
-	pass
 
 @rpc("call_local")
 func play_shoot_effects():
@@ -239,3 +239,6 @@ func update_color(color):
 
 func pause(state):
 	paused = state
+
+func _on_dash_cooldown_timeout():
+	can_dash = true

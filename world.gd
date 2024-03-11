@@ -15,6 +15,7 @@ signal game_paused(paused)
 @onready var color_menu = $"CanvasLayer/Color Menu"
 @onready var scoreboard = $CanvasLayer/HUD/Scoreboard
 @onready var username_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/UsernameEntry"
+@onready var hitmarker = $CanvasLayer/HUD/Hitmarker
 
 
 const Player = preload("res://player.tscn")
@@ -23,6 +24,9 @@ var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
 var in_game = false
+var is_host = false
+
+var peer_ids = []
 
 func _ready():
 	#find_available_port()
@@ -43,6 +47,7 @@ func _unhandled_input(event):
 		pause_menu.hide()
 
 func _on_host_button_pressed():
+	is_host = true
 	main_menu.hide()
 	HUD.show()
 	
@@ -57,6 +62,7 @@ func _on_host_button_pressed():
 		add_player(username_entry.text)
 	
 	upnp_setup()
+	
 	in_game = true
 
 func _on_join_button_pressed():
@@ -75,21 +81,41 @@ func _on_join_button_pressed():
 func add_player(peer_id):
 	var player = Player.instantiate()
 	player.name = str(peer_id)
-	var playerLabel = Label.new()
-	playerLabel.name = str(peer_id)
-	playerLabel.text = str(peer_id) + ":"
-	playerLabel.add_theme_font_size_override(str(peer_id), 200)
-	scoreboard.add_child(playerLabel)
+	if is_host == true:
+		update_scoreboard(peer_id)
 	add_child(player)
+	peer_ids.append(peer_id)
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
 		player.ammo_changed.connect(update_ammo_label)
+		player.hitmarker.connect(show_hitmarker)
+	print(peer_ids)
 
+@rpc("call_local")
+func update_scoreboard(peer_id):
+	var playerLabel = Label.new()
+	playerLabel.name = str(peer_id)
+	playerLabel.text = str(peer_id) + ": "
+	playerLabel.add_theme_font_size_override("font", 40)
+	scoreboard.add_child(playerLabel)
+
+@rpc("call_local")
+func remove_scoreboard(peer_id):
+	var node_index = 0
+	for i in range(peer_ids.size()):
+		if peer_ids[i] == peer_id:
+			node_index = i
+	var playerLabel = scoreboard.get_child(node_index)
+	scoreboard.remove_child(playerLabel)
 
 func remove_player(peer_id):
 	var player = get_node_or_null(str(peer_id))
+	for i in range(peer_ids.size()):
+		if peer_ids[i] == peer_id:
+			peer_ids.pop_at(i)
 	if player:
 		player.queue_free()
+		remove_scoreboard.rpc(peer_id)
 
 func update_health_bar(health_value):
 	health_bar.value = health_value
@@ -101,6 +127,9 @@ func _on_multiplayer_spawner_spawned(node):
 	if node.is_multiplayer_authority():
 		node.health_changed.connect(update_health_bar)
 		node.ammo_changed.connect(update_ammo_label)
+		node.hitmarker.connect(show_hitmarker)
+		
+	update_scoreboard.rpc(node.name)
 
 func upnp_setup():
 	var upnp = UPNP.new()
@@ -134,6 +163,7 @@ func pause_game():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		game_paused.emit(false)
 
+
 func find_available_port():
 		while PORT < 9999:
 			var upnp = UPNP.new()
@@ -144,6 +174,10 @@ func find_available_port():
 				PORT += 1
 				print(PORT)
 
+func show_hitmarker():
+	hitmarker.show()
+	await get_tree().create_timer(0.1).timeout
+	hitmarker.hide()
 
 func _on_quit_button_pressed():
 	get_tree().quit()
