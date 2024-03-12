@@ -19,7 +19,7 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 6001
+var PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
