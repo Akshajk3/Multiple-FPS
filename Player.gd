@@ -56,6 +56,8 @@ var direction = Vector3()
 @export var dash_speed = 50
 var can_dash = true
 
+var color = Color(1.0, 1.0, 1.0)
+
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
 
@@ -65,9 +67,9 @@ func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	camera.current = true
 	get_parent().sens_changed.connect(update_sens)
-	get_parent().color_changed.connect(update_color)
+	get_parent().color_changed.connect(change_color)
 	get_parent().game_paused.connect(pause)
-	update_username.rpc()
+	color = mesh.material_override.albedo_color
 
 func _unhandled_input(event):
 	if not is_multiplayer_authority():
@@ -178,6 +180,8 @@ func _physics_process(delta):
 		camera.fov = lerp(camera.fov, 75.0, delta * 8.0)
 
 	move_and_slide()
+	update_username.rpc()
+	update_color.rpc(color)
 
 @rpc("call_local")
 func play_shoot_effects():
@@ -204,7 +208,11 @@ func play_reload_effects():
 
 @rpc("call_local")
 func update_username():
-	username_label.text = get_name()
+	var name = get_name()
+	if name == str(1):
+		username_label.text = "Host"
+	else:
+		username_label.text = name
 
 @rpc("any_peer")
 func receive_damage():
@@ -228,13 +236,13 @@ func _on_animation_player_animation_finished(anim_name):
 func update_sens(sens):
 	MOUSE_SENS = sens / 10000
 
-func change_color(color):
-	update_color.rpc(color)
+func change_color(cooler):
+	color = cooler
 
 @rpc("call_local")
 func update_color(color):
 	var new_material = StandardMaterial3D.new()
-	new_material.albedo_color = Color(1.0, 1.0, 1.0)
+	new_material.albedo_color = color
 	mesh.material_override = new_material
 
 func pause(state):

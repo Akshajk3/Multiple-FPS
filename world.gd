@@ -3,6 +3,7 @@ extends Node
 signal sens_changed(sens_value)
 signal color_changed(color)
 signal game_paused(paused)
+signal username_changed(username)
 
 @onready var main_menu = $"CanvasLayer/Main Menu"
 @onready var address_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/AddressEntry"
@@ -19,7 +20,7 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 6001
+var PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
@@ -27,6 +28,8 @@ var in_game = false
 var is_host = false
 
 var peer_ids = []
+
+var username = ""
 
 func _ready():
 	#find_available_port()
@@ -61,7 +64,7 @@ func _on_host_button_pressed():
 	else:
 		add_player(username_entry.text)
 	
-	#upnp_setup()
+	upnp_setup()
 	
 	in_game = true
 
@@ -88,9 +91,7 @@ func add_player(peer_id):
 		player.ammo_changed.connect(update_ammo_label)
 		player.hitmarker.connect(show_hitmarker)
 	if is_host:
-		print("Hello")
 		update_scoreboard(peer_id)
-	print(peer_ids)
 
 @rpc("call_local")
 func update_scoreboard(peer_id):
@@ -102,28 +103,12 @@ func update_scoreboard(peer_id):
 
 @rpc("call_local")
 func remove_scoreboard(peer_id):
-	var node_index = -1
-	print("Size: ", peer_ids.size())
-	for i in range(1):
-		print("Index: ", i)
-		if peer_ids[i] == peer_id:
-			node_index = i
-			break
-	if node_index != -1:
-		var playerLabel = scoreboard.get_child(node_index)
-		print("Removing Player: ", playerLabel.name)
-		scoreboard.remove_child(playerLabel)
-	else:
-		print("Peer ID ", peer_id, " not found in scoreboard.")
+	var score = scoreboard.get_node_or_null(str(peer_id))
+	if score:
+		score.queue_free()
 
 func remove_player(peer_id):
-	var player
-	for child in scoreboard.get_children():
-		if child.text == peer_id:
-			player = child
-	for i in range(peer_ids.size()):
-		if peer_ids[i] == peer_id:
-			peer_ids.pop_at(i)
+	var player = get_node_or_null(str(peer_id))
 	if player:
 		remove_scoreboard.rpc(peer_id)
 		player.queue_free()
