@@ -19,7 +19,7 @@ signal game_paused(paused)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 9999
+var PORT = 6001
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
@@ -61,7 +61,7 @@ func _on_host_button_pressed():
 	else:
 		add_player(username_entry.text)
 	
-	upnp_setup()
+	#upnp_setup()
 	
 	in_game = true
 
@@ -117,7 +117,10 @@ func remove_scoreboard(peer_id):
 		print("Peer ID ", peer_id, " not found in scoreboard.")
 
 func remove_player(peer_id):
-	var player = get_node_or_null(str(peer_id))
+	var player
+	for child in scoreboard.get_children():
+		if child.text == peer_id:
+			player = child
 	for i in range(peer_ids.size()):
 		if peer_ids[i] == peer_id:
 			peer_ids.pop_at(i)
