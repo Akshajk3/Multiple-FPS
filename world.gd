@@ -17,10 +17,11 @@ signal username_changed(username)
 @onready var scoreboard = $CanvasLayer/HUD/Scoreboard
 @onready var username_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/UsernameEntry"
 @onready var hitmarker = $CanvasLayer/HUD/Hitmarker
+@onready var username_label = $"CanvasLayer/HUD/Username Label"
 
 
 const Player = preload("res://player.tscn")
-var PORT = 6001
+var PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false
@@ -49,6 +50,10 @@ func _unhandled_input(event):
 		HUD.hide()
 		pause_menu.hide()
 
+func _process(delta):
+	#username_changed.emit(username)
+	pass
+
 func _on_host_button_pressed():
 	is_host = true
 	main_menu.hide()
@@ -59,10 +64,16 @@ func _on_host_button_pressed():
 	multiplayer.peer_connected.connect(add_player)
 	multiplayer.peer_disconnected.connect(remove_player)
 	
+	var unique_id = multiplayer.get_unique_id()
+	
 	if username_entry.text == "":
-		add_player(multiplayer.get_unique_id())
+		username = str(unique_id)
 	else:
-		add_player(username_entry.text)
+		username = username_entry.text
+	
+	username_label.text = "Username: " + username
+	
+	add_player(unique_id)
 	
 	upnp_setup()
 	
@@ -76,6 +87,8 @@ func _on_join_button_pressed():
 		address = "104.33.64.173"
 	else:
 		address = address_entry.text
+	
+	
 	enet_peer.create_client(address, PORT)
 	multiplayer.multiplayer_peer = enet_peer
 	address_label.text = ""
@@ -86,6 +99,14 @@ func add_player(peer_id):
 	player.name = str(peer_id)
 	add_child(player)
 	peer_ids.append(peer_id)
+	
+	if not is_host:
+		if username_entry.text == "":
+			username = str(peer_id)
+		else:
+			username = username_entry.text
+		username_label.text = "Username: " + peer_id
+	
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
 		player.ammo_changed.connect(update_ammo_label)

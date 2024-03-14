@@ -69,6 +69,7 @@ func _ready():
 	get_parent().sens_changed.connect(update_sens)
 	get_parent().color_changed.connect(change_color)
 	get_parent().game_paused.connect(pause)
+	get_parent().username_changed.connect(update_username)
 	color = mesh.material_override.albedo_color
 
 func _unhandled_input(event):
@@ -206,11 +207,14 @@ func play_reload_effects():
 		ammo = pistol_ammo
 	ammo_changed.emit(ammo)
 
+func change_name(username):
+	name = username
+
 @rpc("call_local")
 func update_username():
 	var name = get_name()
 	if name == str(1):
-		username_label.text = "Host"
+		username_label.text = "Clearcash"
 	else:
 		username_label.text = name
 
