@@ -111,8 +111,7 @@ func _process(delta):
 			hitmarker.emit()
 	
 	if hit_player != null:
-		if hit_player.is_dead():
-			score += 1
+		if hit_player.is_dead() == true:
 			print("hello")
 	
 	if Input.is_action_just_pressed("reload") and anim_player.current_animation != current_weapon + "_reload":
@@ -239,7 +238,6 @@ func receive_damage():
 	health -= 10
 	if health <= 0:
 		dead = true
-		death_timer.start()
 		health = 100
 		position = Vector3.ZERO
 		if current_weapon == "rifle":
