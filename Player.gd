@@ -110,6 +110,11 @@ func _process(delta):
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
 			hitmarker.emit()
 	
+	if hit_player != null:
+		if hit_player.is_dead():
+			score += 1
+			print("hello")
+	
 	if Input.is_action_just_pressed("reload") and anim_player.current_animation != current_weapon + "_reload":
 		if current_weapon == "rifle" and ammo >= 30:
 			pass
@@ -233,8 +238,8 @@ func update_username():
 func receive_damage():
 	health -= 10
 	if health <= 0:
-		if hit_player != null:
-			hit_player.add_score.rpc_id(hit_player.get_multiplayer_authority())
+		dead = true
+		death_timer.start()
 		health = 100
 		position = Vector3.ZERO
 		if current_weapon == "rifle":
@@ -267,3 +272,7 @@ func pause(state):
 
 func _on_dash_cooldown_timeout():
 	can_dash = true
+
+
+func _on_death_timer_timeout():
+	dead = false
