@@ -15,6 +15,7 @@ signal hitmarker()
 @onready var username_label = $Username
 @onready var dash_cooldown = $DashCooldown
 @onready var dash_timer = $DashTimer
+@onready var death_timer = $DeathTimer
 
 @export var health = 100
 @onready var player_color = mesh.material_override.albedo_color
@@ -43,6 +44,7 @@ var current_damage = rifle_damage
 
 var current_weapon = "rifle"
 
+
 @export var MOUSE_SENS = 0.003
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -56,7 +58,13 @@ var direction = Vector3()
 @export var dash_speed = 50
 var can_dash = true
 
+var dead = false
+
 var color = Color(1.0, 1.0, 1.0)
+
+var hit_player
+
+var score = 0
 
 func _enter_tree():
 	set_multiplayer_authority(str(name).to_int())
@@ -98,7 +106,7 @@ func _process(delta):
 	if Input.is_action_pressed("shoot") and anim_player.current_animation != current_weapon + "_shoot" and anim_player.current_animation != current_weapon + "_reload" and ammo > 0:
 		play_shoot_effects.rpc()
 		if raycast.is_colliding():
-			var hit_player = raycast.get_collider()
+			hit_player = raycast.get_collider()
 			hit_player.receive_damage.rpc_id(hit_player.get_multiplayer_authority())
 			hitmarker.emit()
 	
@@ -184,6 +192,9 @@ func _physics_process(delta):
 	update_username.rpc()
 	update_color.rpc(color)
 
+func is_dead():
+	return dead
+
 @rpc("call_local")
 func play_shoot_effects():
 	anim_player.stop()
@@ -222,6 +233,8 @@ func update_username():
 func receive_damage():
 	health -= 10
 	if health <= 0:
+		if hit_player != null:
+			hit_player.add_score.rpc_id(hit_player.get_multiplayer_authority())
 		health = 100
 		position = Vector3.ZERO
 		if current_weapon == "rifle":

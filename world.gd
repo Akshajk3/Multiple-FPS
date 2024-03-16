@@ -100,13 +100,6 @@ func add_player(peer_id):
 	add_child(player)
 	peer_ids.append(peer_id)
 	
-	if not is_host:
-		if username_entry.text == "":
-			username = str(peer_id)
-		else:
-			username = username_entry.text
-		username_label.text = "Username: " + peer_id
-	
 	if player.is_multiplayer_authority():
 		player.health_changed.connect(update_health_bar)
 		player.ammo_changed.connect(update_ammo_label)
@@ -147,6 +140,12 @@ func _on_multiplayer_spawner_spawned(node):
 		node.hitmarker.connect(show_hitmarker)
 		
 	update_scoreboard.rpc(node.name)
+	if username_entry.text == "":
+		username = node.name
+		print(node.name)
+	else:
+		username = username_entry.text
+	username_label.text = "Username: " + username
 
 func upnp_setup():
 	var upnp = UPNP.new()
