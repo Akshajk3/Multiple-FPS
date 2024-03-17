@@ -21,7 +21,7 @@ signal username_changed(username)
 
 
 const Player = preload("res://player.tscn")
-var PORT = 9000
+var PORT = 9999
 var enet_peer = ENetMultiplayerPeer.new()
 
 var paused = false

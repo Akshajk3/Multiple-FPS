@@ -349,6 +349,7 @@ text = "Host"
 [node name="DashCooldown" type="Timer" parent="."]
 
 [node name="DeathTimer" type="Timer" parent="."]
+one_shot = true
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 [connection signal="timeout" from="DashCooldown" to="." method="_on_dash_cooldown_timeout"]
