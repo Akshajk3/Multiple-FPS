@@ -18,6 +18,7 @@ signal username_changed(username)
 @onready var username_entry = $"CanvasLayer/Main Menu/MarginContainer/VBoxContainer/UsernameEntry"
 @onready var hitmarker = $CanvasLayer/HUD/Hitmarker
 @onready var username_label = $"CanvasLayer/HUD/Username Label"
+@onready var crosshair = $CanvasLayer/HUD/TextureRect
 
 
 const Player = preload("res://player.tscn")
@@ -51,8 +52,10 @@ func _unhandled_input(event):
 		pause_menu.hide()
 
 func _process(delta):
-	#username_changed.emit(username)
-	pass
+	if Input.is_action_pressed("ads"):
+		crosshair.hide()
+	else:
+		crosshair.show()
 
 func _on_host_button_pressed():
 	is_host = true
