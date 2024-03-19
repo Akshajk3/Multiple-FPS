@@ -3,9 +3,7 @@ extends Node3D
 @export var ADS_SPEED = 20
 
 @export var default_position : Vector3
-@export var defualt_rotation : Vector3
 @export var ads_position : Vector3
-@export var ads_rotation : Vector3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

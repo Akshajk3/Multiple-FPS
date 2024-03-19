@@ -14,7 +14,6 @@ signal hitmarker()
 @onready var pistol = $Camera3D/Pistol
 @onready var username_label = $Username
 @onready var dash_cooldown = $DashCooldown
-@onready var dash_timer = $DashTimer
 @onready var death_timer = $DeathTimer
 @onready var rifle_player = $"Camera3D/Hand/FPS Rifle/Rifle Player"
 
@@ -24,6 +23,8 @@ signal hitmarker()
 @onready var muzzel_flash = $"Camera3D/Hand/FPS Rifle/MuzzleFlash"
 
 @onready var gunshot = $gunshot
+@onready var reload = $reload
+@onready var footsteps = $footsteps
 
 const JUMP_VELOCITY = 9
 
@@ -196,7 +197,9 @@ func _physics_process(delta):
 		pass
 	elif input_dir != Vector2.ZERO and is_on_floor():
 		rifle_player.play("Rig|AK_Walk")
+		#footsteps.play()
 	else:
+		footsteps.stop()
 		rifle_player.play("Rig|AK_Idle")
 	
 	
@@ -237,6 +240,7 @@ func play_reload_effects():
 		pistol_ammo = 8
 		ammo = pistol_ammo
 	ammo_changed.emit(ammo)
+	reload.play()
 
 func change_name(username):
 	name = username

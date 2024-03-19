@@ -114,7 +114,7 @@ func add_player(peer_id):
 func update_scoreboard(peer_id):
 	var playerLabel = Label.new()
 	playerLabel.name = str(peer_id)
-	playerLabel.text = username + ": "
+	playerLabel.text = str(peer_id) + ": "
 	playerLabel.add_theme_font_size_override("font", 40)
 	scoreboard.add_child(playerLabel)
 
