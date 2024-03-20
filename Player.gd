@@ -15,6 +15,7 @@ signal hitmarker()
 @onready var dash_timer = $DashTimer
 @onready var death_timer = $DeathTimer
 @onready var rifle_player = $"Camera3D/Hand/FPS Rifle/Rifle Player"
+@onready var pistol_player = $"Camera3D/FPS Pistol/AnimationPlayer"
 
 @export var health = 100
 @onready var player_color = mesh.material_override.albedo_color

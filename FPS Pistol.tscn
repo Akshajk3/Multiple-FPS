@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://hvll5bkbmmmx"]
+
+[ext_resource type="PackedScene" uid="uid://cpq871mg8peur" path="res://models/fps_pistol_animations/scene.gltf" id="1_pw3xw"]
+
+[node name="FPS Pistol" instance=ExtResource("1_pw3xw")]
+
+[node name="Skeleton3D" parent="Sketchfab_model/3ab9f780f2294ec8ba398c31f25c6b54_fbx/Object_2/RootNode/Armature/Object_6" index="0"]
+bones/3/rotation = Quaternion(-0.619534, -0.125224, 0.465286, 0.619682)
+bones/4/rotation = Quaternion(-0.657909, -0.137972, -0.0550528, 0.738301)
+bones/6/rotation = Quaternion(-3.31673e-08, -0.392845, 1.58368e-07, 0.919605)
+bones/7/rotation = Quaternion(-3.79654e-08, -0.51268, -1.20811e-07, 0.85858)
+bones/10/rotation = Quaternion(-0.394255, 0.191747, -0.235062, 0.867492)
+bones/11/rotation = Quaternion(-0.839642, 0.0989353, 0.07026, 0.529412)
+bones/13/rotation = Quaternion(-5.38055e-08, -0.0971494, -1.2773e-07, 0.99527)
+bones/14/rotation = Quaternion(7.88941e-08, -0.129368, 1.29612e-07, 0.991597)
+bones/18/position = Vector3(-0.0439129, -0.0343492, 0.218951)
+bones/18/rotation = Quaternion(-0.0432887, 0.0248938, 0.985421, -0.162641)
+bones/21/rotation = Quaternion(0.0553431, -0.00808424, 0.344898, 0.936972)
+bones/22/rotation = Quaternion(-0.00976008, 0.00390567, 0.254643, 0.966978)
+bones/23/rotation = Quaternion(0.00293469, -0.00317699, 0.39406, 0.919075)
+bones/25/rotation = Quaternion(-0.0258932, -0.0353796, -0.028236, 0.998639)
+bones/27/rotation = Quaternion(0.00870376, 0.0135177, 0.318148, 0.947905)
+bones/32/rotation = Quaternion(0.00486004, -0.0166307, 0.424533, 0.905247)
+bones/37/rotation = Quaternion(0.0253435, -0.0016992, 0.355744, 0.934238)
+bones/38/rotation = Quaternion(0.00801458, 0.024886, 0.348812, 0.936828)
+bones/40/rotation = Quaternion(-0.440771, 0.569404, -0.254717, 0.645461)
+bones/41/rotation = Quaternion(0.00799569, -0.00803804, 0.243799, 0.969759)
+bones/46/position = Vector3(-0.0812857, 0.0321588, 0.219372)
+bones/46/rotation = Quaternion(-0.0493139, 0.010508, 0.52994, 0.846535)
+bones/68/rotation = Quaternion(0.373839, 0.7517, -0.296044, -0.455577)
+bones/74/position = Vector3(-0.0761713, -0.0263954, 0.350357)
+bones/74/rotation = Quaternion(0.139419, 0.0315886, -0.126505, 0.981611)
+bones/79/position = Vector3(-0.0800217, -0.0300353, 0.356993)
+bones/79/rotation = Quaternion(0.00849226, 0.0281464, -0.13031, 0.991037)
+
+[node name="AnimationPlayer" parent="." index="1"]
+autoplay = "Armature|FPS_Pistol_Walk"

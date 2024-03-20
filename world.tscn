@@ -111,7 +111,6 @@ scale = Vector2(0.03, 0.03)
 pivot_offset = Vector2(960, 540)
 texture = ExtResource("3_p4iuf")
 stretch_mode = 5
-metadata/_edit_use_anchors_ = true
 
 [node name="Hitmarker" type="TextureRect" parent="CanvasLayer/HUD"]
 visible = false
@@ -132,7 +131,6 @@ scale = Vector2(0.03, 0.03)
 pivot_offset = Vector2(960, 540)
 texture = ExtResource("4_cs5wv")
 stretch_mode = 5
-metadata/_edit_use_anchors_ = true
 
 [node name="Health Bar" type="ProgressBar" parent="CanvasLayer/HUD"]
 layout_mode = 1
